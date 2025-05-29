@@ -32,13 +32,18 @@ def plot_diffusion(x_seq):
         axs[int(i/5), i%5].set_title('$q(\mathbf{x}_{'+str((i+1)*interval)+'})$')
     plt.tight_layout()
 
-def plot_compare(ddpm, dataset, cond, test_id):
-    cond_s = cond[test_id*28:(test_id+1)*28]
-    x_seq = ddpm.sample_seq(batch_size=28, cond=cond_s)
+def plot_compare(test_id, checkpoint):
+    dataset = checkpoint['dataset']
+    ddpm = checkpoint['ddpm']
+    cond = checkpoint['cond']
+    args = checkpoint['config']
+    day_len = args["day_len"]
+    cond_s = cond[test_id*day_len:(test_id+1)* day_len]
+    x_seq = ddpm.sample_seq(batch_size=day_len, cond=cond_s)
 
     x_seq = x_seq.to("cpu")
 
-    test_data = dataset[test_id*28:(test_id+1)*28].to('cpu')
+    test_data = dataset[test_id*day_len:(test_id+1)*day_len].to('cpu')
     plt.figure(figsize=(15,3), dpi=300)
     plt.subplot(1,4,1)
     for i in range(len(test_data)):
@@ -57,6 +62,40 @@ def plot_compare(ddpm, dataset, cond, test_id):
     plt.plot(test_data.var(dim=0), label = "variance of actual data")
     plt.legend(fontsize=10)
     plt.tight_layout()
+
+def plot_compare_PV(test_id, checkpoint):
+    dataset = checkpoint['dataset']
+    ddpm = checkpoint['ddpm']
+    cond = checkpoint['cond']
+    PV_base = checkpoint['PV_base']
+    args = checkpoint['config']
+    day_len = args["day_len"]
+    cond_s = cond[test_id*day_len:(test_id+1)*day_len]
+    cond_PV_base = PV_base[test_id*day_len:(test_id+1)*day_len]
+    x_seq = ddpm.sample_seq(batch_size=day_len, cond=cond_s, PV_base = cond_PV_base)
+
+    x_seq = x_seq.to("cpu")
+
+    test_data = dataset[test_id*day_len:(test_id+1)*day_len].to('cpu')
+    plt.figure(figsize=(15,3), dpi=300)
+    plt.subplot(1,4,1)
+    for i in range(len(test_data)):
+        plt.plot(test_data[i])
+    plt.title("actual data")
+    plt.subplot(1,4,2)
+    for i in range(len(x_seq[-1])):
+        plt.plot(x_seq[-1][i])
+    plt.title("generated data")
+    plt.subplot(1,4,3)
+    plt.plot(x_seq[-1].mean(dim=0), label = "mean of generated data")
+    plt.plot(test_data.mean(dim=0), label = "mean of actual data")
+    plt.legend(fontsize=10)
+    plt.subplot(1,4,4)
+    plt.plot(x_seq[-1].var(dim=0), label = "variance of generated data")
+    plt.plot(test_data.var(dim=0), label = "variance of actual data")
+    plt.legend(fontsize=10)
+    plt.tight_layout()
+
 
 # plot deterministic component
 def plot_determ_comp(ddpm, cond, test_id):
