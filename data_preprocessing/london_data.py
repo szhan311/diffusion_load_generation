@@ -8,13 +8,13 @@ from scipy import sparse
 # 0. READ + NORMALISE COLUMN NAMES
 # ----------------------------------------------------------------------
 
-# full data
-data_path = Path("../data/london")
-csv_file  = data_path / "CC_LCL-FullData.csv"
+# # full data
+# data_path = Path("../data/london")
+# csv_file  = data_path / "CC_LCL-FullData.csv"
 
-# # partial data
-# data_path = Path("../data/london/Small LCL Data")
-# csv_file  = data_path / "LCL-June2015v2_0.csv"
+# partial data
+data_path = Path("../data/london/Small LCL Data")
+csv_file  = data_path / "LCL-June2015v2_0.csv"
 
 df = (pd.read_csv(csv_file, low_memory=False).rename(columns=lambda c: c.strip()))                 # ← trims blanks
 
@@ -134,15 +134,14 @@ max_y = max(y_tr.max(), y_val.max())
 y_val = y_val / max_y
 y_tr = y_tr / max_y
 
+# # full data
+# torch.save(X_tr_t, "../data/london/tensor_full/X_tr.pt")
+# torch.save(X_val_t, "../data/london/tensor_full/X_val.pt")
+# torch.save(y_tr, "../data/london/tensor_full/y_tr.pt")
+# torch.save(y_val, "../data/london/tensor_full/y_val.pt")
 
-# full data
-torch.save(X_tr_t, "../data/london/tensor_full/X_tr.pt")
-torch.save(X_val_t, "../data/london/tensor_full/X_val.pt")
-torch.save(y_tr, "../data/london/tensor_full/y_tr.pt")
-torch.save(y_val, "../data/london/tensor_full/y_val.pt")
-
-# # partial data
-# torch.save(X_tr_t, "../data/london/tensor_small/X_tr.pt")
-# torch.save(X_val_t, "../data/london/tensor_small/X_val.pt")
-# torch.save(y_tr, "../data/london/tensor_small/y_tr.pt")
-# torch.save(y_val, "../data/london/tensor_small/y_val.pt")
+# partial data
+torch.save(X_tr_t, "../data/london/tensor_small/X_tr.pt")
+torch.save(X_val_t, "../data/london/tensor_small/X_val.pt")
+torch.save(y_tr, "../data/london/tensor_small/y_tr.pt")
+torch.save(y_val, "../data/london/tensor_small/y_val.pt")
