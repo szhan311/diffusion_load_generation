@@ -13,10 +13,11 @@ device = torch.device("cuda") if torch.cuda.is_available() else "cpu"
 
 
 def main(args):
-    X_tr = torch.load(f"./london/X_tr_{args.num_users}.pt")
-    X_val = torch.load(f"./london/X_val_{args.num_users}.pt")
-    y_tr = torch.load(f"./london/y_tr_{args.num_users}.pt")
-    y_val = torch.load(f"./london/y_val_{args.num_users}.pt")
+    save_dir = f"../data/london/{args.num_users}"
+    X_tr = torch.load(f"{save_dir}/X_tr.pt")
+    X_val = torch.load(f"{save_dir}/X_val.pt")
+    y_tr = torch.load(f"{save_dir}/y_tr.pt")
+    y_val = torch.load(f"{save_dir}/y_val.pt")
     # Select betas
     n_steps = args.n_steps
     args.cond_dim = X_tr.shape[-1]
