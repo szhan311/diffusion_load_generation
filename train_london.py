@@ -6,14 +6,14 @@ from utils.helper import make_beta_schedule, EMA, ObjectView
 from utils.plots import hdr_plot_style
 hdr_plot_style()
 from tqdm import tqdm
-from models.DiffLoad.diffusion.ddpm import DDPM1d
+from models.DiffLoad.ddpm import DDPM1d
 import datetime
 
 device = torch.device("cuda") if torch.cuda.is_available() else "cpu"
 
 
 def main(args):
-    save_dir = f"../data/london/{args.num_users}"
+    save_dir = f"./data/london/{args.num_users}"
     X_tr = torch.load(f"{save_dir}/X_tr.pt")
     X_val = torch.load(f"{save_dir}/X_val.pt")
     y_tr = torch.load(f"{save_dir}/y_tr.pt")
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     'cond_dim': 251,
     'epoch': 40000,
     'batch_size': 5000,
-    'learning_rate': 5e-4,
+    'learning_rate': 1e-4,
     'lr_decay': 0.9,
     'lr_decay_step':1000,
     'ema_decay': 0.9,
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     'beta_end': 2e-2,
     'loss_type': 'l2',
     'num_class': 50,
-    'num_users': 500,
+    'num_users': 200,
     }
     args = ObjectView(config)
     print(args.n_steps)

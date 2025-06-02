@@ -3,15 +3,15 @@ from pathlib import Path
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from scipy import sparse
-
-num_users = 500
+import os
+num_users = 200
 
 
 # ----------------------------------------------------------------------
 # 0. READ + NORMALISE COLUMN NAMES
 # ----------------------------------------------------------------------
 # full data
-data_path = Path("./london")
+data_path = Path("../data/london")
 csv_file  = data_path / "CC_LCL-FullData.csv"
 
 df = (pd.read_csv(csv_file, low_memory=False)
@@ -135,8 +135,9 @@ max_y = max(y_tr.max(), y_val.max())
 y_val = y_val / max_y
 y_tr = y_tr / max_y
 
-
-torch.save(X_tr_t, f"../data/london/{num_users}/X_tr.pt")
-torch.save(X_val_t, f"../data/london/{num_users}/X_val.pt")
-torch.save(y_tr, f"../data/london/{num_users}/y_tr.pt")
-torch.save(y_val, f"../data/london/{num_users}/y_val.pt")
+save_dir = f"../data/london/{num_users}"
+os.makedirs(save_dir, exist_ok=True)
+torch.save(X_tr_t, f"{save_dir}/X_tr.pt")
+torch.save(X_val_t, f"{save_dir}/X_val.pt")
+torch.save(y_tr, f"{save_dir}/y_tr.pt")
+torch.save(y_val, f"{save_dir}/y_val.pt")

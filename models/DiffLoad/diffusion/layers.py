@@ -175,3 +175,67 @@ class CondModel_v2(nn.Module):
         out = F.leaky_relu(self.linear1(trans_enc))
         if self.use_MLP: out = out + self.cond_embedder2(cond)
         return self.linear2(out)
+    
+
+
+# conditional model without PV
+class Attention(nn.Module):
+    def __init__(self,args):
+        super().__init__()
+        self.lstm = nn.LSTM(args.input_dim,args.hidden_dim, num_layers=1, batch_first=True)
+        self.cond_embedder = nn.Sequential(
+            nn.Linear(args.cond_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh(),
+            nn.Linear(args.hidden_dim, args.hidden_dim),
+            nn.Tanh()
+        )
+        # self.cond_embedder2 = nn.Sequential(
+        #     nn.Linear(args.cond_dim, args.hidden_dim),
+        #     nn.Tanh(),
+        #     nn.Linear(args.hidden_dim, args.hidden_dim),
+        #     nn.Tanh()
+        # )
+        # self.cond_embedder3 = nn.Sequential(
+        #     nn.Linear(args.cond_dim, args.hidden_dim),
+        #     nn.Tanh(),
+        #     nn.Linear(args.hidden_dim, 7),
+        #     nn.Softmax()
+        # )
+        self.embedding = PositionalEncoding(args.hidden_dim)
+        self.encoder_layer = nn.TransformerEncoderLayer(
+            d_model=args.hidden_dim, nhead=4, dim_feedforward=args.hidden_dim
+        )
+        self.trans_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=1)
+        self.linear1 = nn.Linear(args.hidden_dim, args.hidden_dim)
+        self.linear2 = nn.Linear(args.hidden_dim, args.input_dim)
+
+    def forward(self, x, noise, cond = None, PV_base = None):
+        hid_enc, (_, _) = self.lstm(x)
+        noise_emb = self.embedding(noise)
+        hid_enc = hid_enc + noise_emb
+        if cond is not None:
+            cond_emb = self.cond_embedder(cond)
+            hid_enc = hid_enc + cond_emb
+        
+        trans_enc = self.trans_encoder(hid_enc) 
+        out = F.leaky_relu(self.linear1(trans_enc))
+        
+        return self.linear2(out)
