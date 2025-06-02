@@ -4,19 +4,21 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from scipy import sparse
 
+num_users = 500
+
+
 # ----------------------------------------------------------------------
 # 0. READ + NORMALISE COLUMN NAMES
 # ----------------------------------------------------------------------
+# full data
+data_path = Path("./london")
+csv_file  = data_path / "CC_LCL-FullData.csv"
 
-# # full data
-# data_path = Path("../data/london")
-# csv_file  = data_path / "CC_LCL-FullData.csv"
+df = (pd.read_csv(csv_file, low_memory=False)
+        .rename(columns=lambda c: c.strip()))                 # ← trims blanks
 
-# partial data
-data_path = Path("../data/london/Small LCL Data")
-csv_file  = data_path / "LCL-June2015v2_0.csv"
-
-df = (pd.read_csv(csv_file, low_memory=False).rename(columns=lambda c: c.strip()))                 # ← trims blanks
+top_k_lclid = df['LCLid'].unique()[:num_users]
+df = df[df['LCLid'].isin(top_k_lclid)]
 
 # <---- add this line
 df["KWH/hh (per half hour)"] = pd.to_numeric(
@@ -24,7 +26,6 @@ df["KWH/hh (per half hour)"] = pd.to_numeric(
 
 df = df[["LCLid", "DateTime", "KWH/hh (per half hour)"]]
 df["DateTime"] = pd.to_datetime(df["DateTime"])
-
 # ----------------------------------------------------------------------
 # 1.  EXTRA TIME KEYS
 # ----------------------------------------------------------------------
@@ -90,7 +91,7 @@ dataset  = profiles.merge(calendar, on=["LCLid","Date"], how="left")
 # 4.  ENCODE CONDITIONS  (pick ONE path)
 # ----------------------------------------------------------------------
 # ---- Path A: one-hot (for tree models) -------------------------------
-ohe = OneHotEncoder(handle_unknown="ignore", sparse_output=True)
+ohe = OneHotEncoder(handle_unknown="ignore", sparse=True)
 X_cat = ohe.fit_transform(dataset[["LCLid","Month","DayOfWeek","DayOfMonth"]])
 X     = sparse.hstack([X_cat, dataset[["WeekOfYear"]].to_numpy()])
 
@@ -134,14 +135,8 @@ max_y = max(y_tr.max(), y_val.max())
 y_val = y_val / max_y
 y_tr = y_tr / max_y
 
-# # full data
-# torch.save(X_tr_t, "../data/london/tensor_full/X_tr.pt")
-# torch.save(X_val_t, "../data/london/tensor_full/X_val.pt")
-# torch.save(y_tr, "../data/london/tensor_full/y_tr.pt")
-# torch.save(y_val, "../data/london/tensor_full/y_val.pt")
 
-# partial data
-torch.save(X_tr_t, "../data/london/tensor_small/X_tr.pt")
-torch.save(X_val_t, "../data/london/tensor_small/X_val.pt")
-torch.save(y_tr, "../data/london/tensor_small/y_tr.pt")
-torch.save(y_val, "../data/london/tensor_small/y_val.pt")
+torch.save(X_tr_t, f"../data/london/{num_users}/X_tr.pt")
+torch.save(X_val_t, f"../data/london/{num_users}/X_val.pt")
+torch.save(y_tr, f"../data/london/{num_users}/y_tr.pt")
+torch.save(y_val, f"../data/london/{num_users}/y_val.pt")
