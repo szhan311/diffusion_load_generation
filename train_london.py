@@ -62,7 +62,7 @@ def main(args):
             Loss.append(loss.item())
         if (j+1) % 10 == 0:
             print("loss: ", loss.item())
-        if (j+1) % 2000 == 0:
+        if (j+1) % 500 == 0:
             checkpoint = {
                 'config': args,
                 'dataset': dataset,
@@ -80,10 +80,10 @@ if __name__ == "__main__":
     config = {
     'n_steps': 500,
     'input_dim': 48,
-    'hidden_dim': 1000,
+    'hidden_dim': 2000,
     'nhead': 4,
     'cond_dim': 251,
-    'epoch': 40000,
+    'epoch': 10000,
     'batch_size': 5000,
     'learning_rate': 1e-4,
     'lr_decay': 0.9,
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     'beta_end': 2e-2,
     'loss_type': 'l2',
     'num_class': 50,
-    'num_users': 200,
+    'num_users': 500,
     }
     args = ObjectView(config)
     print(args.n_steps)

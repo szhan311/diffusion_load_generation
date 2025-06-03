@@ -4,7 +4,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from scipy import sparse
 import os
-num_users = 200
+num_users = 500
 
 
 # ----------------------------------------------------------------------
