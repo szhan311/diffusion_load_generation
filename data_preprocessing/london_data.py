@@ -29,6 +29,7 @@ df["DateTime"] = pd.to_datetime(df["DateTime"])
 # ----------------------------------------------------------------------
 # 1.  EXTRA TIME KEYS
 # ----------------------------------------------------------------------
+print("extra time keys.")
 df["Date"]       = df["DateTime"].dt.date
 df["slot"]       = df["DateTime"].dt.hour*2 + df["DateTime"].dt.minute//30
 df["Month"]      = df["DateTime"].dt.month
@@ -58,6 +59,18 @@ df['KWH/hh (per half hour)'] = df['KWH/hh (per half hour)'].fillna(0)        # o
 
 # 4️⃣  Confirm all gone
 assert df['KWH/hh (per half hour)'].isna().sum() == 0
+
+# 1.1 normalize
+# Assuming df is the DataFrame from your provided code
+# Normalize KWH/hh (per half hour) for each LCLid using Min-Max scaling
+df['KWH/hh (per half hour)'] = df.groupby('LCLid')['KWH/hh (per half hour)'].transform(
+    lambda x: (x - x.min()) / (x.max() - x.min()) if x.max() != x.min() else 0
+)
+
+# Handle cases where max = min (to avoid division by zero)
+# If max = min, the normalized value is set to 0 (or another constant, if preferred)
+df['KWH/hh (per half hour)'] = df['KWH/hh (per half hour)'].fillna(0)
+
 
 # ----------------------------------------------------------------------
 # 2.  ONE 48-ELEMENT PROFILE PER ID-DAY   (**TWO FIXES HERE**)
@@ -131,9 +144,10 @@ X_val_t = torch.from_numpy(X_val_dense)
 y_tr = torch.from_numpy(y_tr).float()
 y_val = torch.from_numpy(y_val).float()
 
-max_y = max(y_tr.max(), y_val.max())
-y_val = y_val / max_y
-y_tr = y_tr / max_y
+# print(y_tr.max(), y_val.max())
+# max_y = max(y_tr.max(), y_val.max())
+# y_val = y_val / max_y
+# y_tr = y_tr / max_y
 
 save_dir = f"../data/london/{num_users}"
 os.makedirs(save_dir, exist_ok=True)
@@ -141,3 +155,4 @@ torch.save(X_tr_t, f"{save_dir}/X_tr.pt")
 torch.save(X_val_t, f"{save_dir}/X_val.pt")
 torch.save(y_tr, f"{save_dir}/y_tr.pt")
 torch.save(y_val, f"{save_dir}/y_val.pt")
+print("done")

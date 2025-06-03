@@ -8,16 +8,17 @@ hdr_plot_style()
 from tqdm import tqdm
 from models.DiffLoad.ddpm import DDPM1d
 import datetime
+import os
 
 device = torch.device("cuda") if torch.cuda.is_available() else "cpu"
 
 
 def main(args):
-    save_dir = f"./data/london/{args.num_users}"
-    X_tr = torch.load(f"{save_dir}/X_tr.pt")
-    X_val = torch.load(f"{save_dir}/X_val.pt")
-    y_tr = torch.load(f"{save_dir}/y_tr.pt")
-    y_val = torch.load(f"{save_dir}/y_val.pt")
+    data_dir = f"./data/london/{args.num_users}"
+    X_tr = torch.load(f"{data_dir}/X_tr.pt")
+    X_val = torch.load(f"{data_dir}/X_val.pt")
+    y_tr = torch.load(f"{data_dir}/y_tr.pt")
+    y_val = torch.load(f"{data_dir}/y_val.pt")
     # Select betas
     n_steps = args.n_steps
     args.cond_dim = X_tr.shape[-1]
@@ -69,7 +70,9 @@ def main(args):
                 'ddpm': ddpm,
                 'Loss': Loss
             }
-            torch.save(checkpoint, f"./result/ckpts/london_{args.num_users}_{j+1}.pth")
+            save_dir = f"./result/ckpts/london_{args.num_users}"
+            os.makedirs(save_dir, exist_ok=True)
+            torch.save(checkpoint, f"{save_dir}/{j+1}.pth")
         
 
 
