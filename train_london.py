@@ -16,8 +16,9 @@ device = torch.device("cuda") if torch.cuda.is_available() else "cpu"
 def main(args):
     data_dir = f"./data/london/{args.num_users}"
     X_tr = torch.load(f"{data_dir}/X_tr.pt")
+    X_val = torch.load(f"{data_dir}/X_val.pt")
     y_tr = torch.load(f"{data_dir}/y_tr.pt")
-    y_tr = y_tr * 2 - 1
+    y_val = torch.load(f"{data_dir}/y_val.pt")
     # Select betas
     n_steps = args.n_steps
     args.cond_dim = X_tr.shape[-1]
@@ -38,7 +39,7 @@ def main(args):
     for j in tqdm(range(args.epoch)):
         # X is a torch Variable
         permutation = torch.randperm(dataset.size()[0])
-        for i in range(0, dataset.size()[0], args.batch_size):
+        for i in tqdm(range(0, dataset.size()[0], args.batch_size)):
             # Retrieve current batch 
             indices = permutation[i:i+args.batch_size]
             batch_x = dataset[indices].to(device)
@@ -57,9 +58,9 @@ def main(args):
             # Update the exponential moving average
             ema.update(model)
             ddpm.model = model
-        if (j+1) % 10 == 0:
+        if (j+1) % 1 == 0:
             Loss.append(loss.item())
-        if (j+1) % 10 == 0:
+        if (j+1) % 1 == 0:
             print("loss: ", loss.item())
         if (j+1) % 500 == 0:
             checkpoint = {
@@ -69,7 +70,7 @@ def main(args):
                 'ddpm': ddpm,
                 'Loss': Loss
             }
-            save_dir = f"./result/ckpts2/london_{args.num_users}"
+            save_dir = f"./result/ckpts9/london_{args.num_users}"
             os.makedirs(save_dir, exist_ok=True)
             torch.save(checkpoint, f"{save_dir}/{j+1}.pth")
         
@@ -79,16 +80,14 @@ if __name__ == "__main__":
     config = {
     'n_steps': 500,
     'input_dim': 48,
-    'hidden_dim': 1000,
+    'hidden_dim': 3000,
     'nhead': 4,
-    'cond_dim': 100,
-    'n_layers': 10,
-    'dropout': 0.1,
-    'epoch': 8000,
+    'cond_dim': 251,
+    'epoch': 3000,
     'batch_size': 5000,
     'learning_rate': 1e-4,
     'lr_decay': 0.9,
-    'lr_decay_step': 50,
+    'lr_decay_step':1000,
     'ema_decay': 0.9,
     'beta_start': 1e-6,
     'beta_end': 2e-2,
