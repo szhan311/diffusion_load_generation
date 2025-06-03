@@ -11,7 +11,7 @@ num_users = 200
 # 0. READ + NORMALISE COLUMN NAMES
 # ----------------------------------------------------------------------
 # full data
-data_path = Path("../data/london")
+data_path = Path("./data/london")
 csv_file  = data_path / "CC_LCL-FullData.csv"
 
 df = (pd.read_csv(csv_file, low_memory=False)
@@ -149,7 +149,7 @@ y_val = torch.from_numpy(y_val).float()
 # y_val = y_val / max_y
 # y_tr = y_tr / max_y
 
-save_dir = f"../data/london/{num_users}"
+save_dir = f"./data/london/{num_users}"
 os.makedirs(save_dir, exist_ok=True)
 torch.save(X_tr_t, f"{save_dir}/X_tr.pt")
 torch.save(X_val_t, f"{save_dir}/X_val.pt")
