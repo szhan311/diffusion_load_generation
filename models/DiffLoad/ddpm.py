@@ -101,3 +101,98 @@ class DDPM1d(nn.Module):
             x_seq.append(cur_x)
 
         return torch.stack(x_seq)
+    
+    @torch.no_grad()
+    def sample_ddim(
+        self,
+        batch_size,
+        cond=None,
+        PV_base=None,
+        ddim_eta: float = 0.0,          # η = 0 → deterministic DDIM
+        ddim_timesteps: list | None = None,
+        return_intermediates: bool = False
+    ):
+        """
+        DDIM sampling method for faster generation.
+        
+        Args:
+            batch_size: Number of samples to generate
+            cond: Conditional information for the model
+            PV_base: Additional conditioning parameter
+            ddim_eta: Stochasticity parameter (0 = deterministic, 1 = DDPM-like)
+            ddim_timesteps: Custom timestep schedule. If None, uses uniform spacing
+            return_intermediates: Whether to return all intermediate states
+        
+        Returns:
+            Generated samples (and optionally intermediate states)
+        """
+        
+        # Set up timestep schedule
+        if ddim_timesteps is None:
+            # Default: uniform spacing with fewer steps for faster sampling
+            skip = self.n_steps // 50  # Use 50 steps by default (adjust as needed)
+            ddim_timesteps = list(range(0, self.n_steps, skip))
+            ddim_timesteps = ddim_timesteps[::-1]  # Reverse for denoising direction
+        
+        # Start from pure noise
+        x = torch.randn(batch_size, *self.signal_size).to(self.device)
+        
+        if return_intermediates:
+            intermediates = [x.clone()]
+        
+        # DDIM sampling loop
+        for i, t in enumerate(ddim_timesteps[:-1]):
+            t_next = ddim_timesteps[i + 1]
+            
+            # Get noise level for current timestep
+            noise_level = torch.FloatTensor([self.alphas_prod_p_sqrt[t+1]]).repeat(batch_size, 1).to(self.device)
+            
+            # Predict noise using the model
+            eps_pred = self.model(x, noise_level, cond, PV_base)
+            
+            # Get alpha values for current and next timesteps
+            alpha_prod_t = self.alphas_prod[t]
+            alpha_prod_t_next = self.alphas_prod[t_next] if t_next >= 0 else torch.tensor(1.0).to(self.device)
+            
+            # Predict x_0 from current x_t and predicted noise
+            sqrt_alpha_prod_t = torch.sqrt(alpha_prod_t)
+            sqrt_one_minus_alpha_prod_t = torch.sqrt(1.0 - alpha_prod_t)
+            
+            pred_x0 = (x - sqrt_one_minus_alpha_prod_t * eps_pred) / sqrt_alpha_prod_t
+            
+            # Clip predicted x_0 if specified
+            if self.clip_denoised:
+                pred_x0 = pred_x0.clamp(-1.0, 1.0)
+            
+            # Compute variance for stochastic sampling
+            if ddim_eta > 0 and t_next > 0:
+                # Variance schedule for DDIM
+                sigma_t = ddim_eta * torch.sqrt(
+                    (1.0 - alpha_prod_t_next) / (1.0 - alpha_prod_t) * 
+                    (1.0 - alpha_prod_t / alpha_prod_t_next)
+                )
+            else:
+                sigma_t = 0.0
+            
+            # Compute the coefficient for the predicted noise direction
+            sqrt_alpha_prod_t_next = torch.sqrt(alpha_prod_t_next)
+            sqrt_one_minus_alpha_prod_t_next = torch.sqrt(1.0 - alpha_prod_t_next - sigma_t**2)
+            
+            # DDIM update step
+            x = (
+                sqrt_alpha_prod_t_next * pred_x0 +
+                sqrt_one_minus_alpha_prod_t_next * eps_pred
+            )
+            
+            # Add stochastic noise if eta > 0
+            if ddim_eta > 0 and t_next > 0:
+                noise = torch.randn_like(x)
+                x = x + sigma_t * noise
+            
+            if return_intermediates:
+                intermediates.append(x.clone())
+        
+        if return_intermediates:
+            return x, torch.stack(intermediates)
+        else:
+            return x
