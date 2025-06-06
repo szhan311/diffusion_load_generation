@@ -4,7 +4,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from scipy import sparse
 import os
-num_users = 500
+num_users = 200
 
 
 # ----------------------------------------------------------------------
@@ -62,7 +62,7 @@ assert df['KWH/hh (per half hour)'].isna().sum() == 0
 
 # Normalize KWH/hh (per half hour) for each LCLid to [-1, 1] using Min-Max scaling
 df['KWH/hh (per half hour)'] = df.groupby('LCLid')['KWH/hh (per half hour)'].transform(
-    lambda x: (2 * (x - x.min()) / (x.max() - x.min()) - 1) if x.max() != x.min() else 0
+    lambda x: ((x - x.min()) / (x.max() - x.min())) if x.max() != x.min() else 0
 )
 
 # Handle cases where max = min (to avoid division by zero)

@@ -76,24 +76,24 @@ def main(args):
 
 if __name__ == "__main__":
     config = {
-    'n_steps': 1000,
+    'n_steps': 500,
     'input_dim': 48,
     'hidden_dim': 2000,
     'nhead': 4,
     'cond_dim': 100,
     'n_layers': 10,
     'dropout': 0.1,
-    'epoch': 2000,
+    'epoch': 8000,
     'batch_size': 5000,
     'learning_rate': 1e-4,
     'lr_decay': 0.9,
-    'lr_decay_step':50,
+    'lr_decay_step': 50,
     'ema_decay': 0.9,
     'beta_start': 1e-6,
     'beta_end': 2e-2,
     'loss_type': 'l2',
     'num_class': 50,
-    'num_users': 500,
+    'num_users': 200,
     }
     args = ObjectView(config)
     print(args.n_steps)
