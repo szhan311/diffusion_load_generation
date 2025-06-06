@@ -81,6 +81,7 @@ class DDPM1d(nn.Module):
 
         if self.clip_denoised and stable is False:
             x_recon.clamp_(-1.0, 1.0)
+            x_recon.clamp_(0.0, 1.0)
 
         model_mean = self.posterior_mean_coef_1[t] * x_recon + self.posterior_mean_coef_2[t] * x
         model_log_variance = self.posterior_log_variance_clipped[t]

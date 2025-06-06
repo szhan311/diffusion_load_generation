@@ -44,8 +44,8 @@ def main(args):
 
 if __name__ == '__main__':
     config = {
-        'num_users':500,
-        'epochs':1500
+        'num_users':200,
+        'epochs':1000
     }
     args = ObjectView(config)
     main(args)
