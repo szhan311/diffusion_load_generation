@@ -4,7 +4,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from scipy import sparse
 import os
-num_users = 200
+num_users = 500
 
 
 # ----------------------------------------------------------------------
@@ -112,7 +112,7 @@ dataset  = profiles.merge(calendar, on=["LCLid","Date"], how="left")
 # 4.  ENCODE CONDITIONS  (pick ONE path)
 # ----------------------------------------------------------------------
 # ---- Path A: one-hot (for tree models) -------------------------------
-ohe = OneHotEncoder(handle_unknown="ignore", sparse=True)
+ohe = OneHotEncoder(handle_unknown="ignore", sparse_output=True)
 X_cat = ohe.fit_transform(dataset[["LCLid","Month","DayOfWeek","DayOfMonth"]])
 X     = sparse.hstack([X_cat, dataset[["WeekOfYear"]].to_numpy()])
 

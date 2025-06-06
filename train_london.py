@@ -17,6 +17,7 @@ def main(args):
     data_dir = f"./data/london/{args.num_users}"
     X_tr = torch.load(f"{data_dir}/X_tr.pt")
     y_tr = torch.load(f"{data_dir}/y_tr.pt")
+    y_tr = y_tr * 2 - 1
     # Select betas
     n_steps = args.n_steps
     args.cond_dim = X_tr.shape[-1]
