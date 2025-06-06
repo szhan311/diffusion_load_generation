@@ -60,11 +60,9 @@ df['KWH/hh (per half hour)'] = df['KWH/hh (per half hour)'].fillna(0)        # o
 # 4️⃣  Confirm all gone
 assert df['KWH/hh (per half hour)'].isna().sum() == 0
 
-# 1.1 normalize
-# Assuming df is the DataFrame from your provided code
-# Normalize KWH/hh (per half hour) for each LCLid using Min-Max scaling
+# Normalize KWH/hh (per half hour) for each LCLid to [-1, 1] using Min-Max scaling
 df['KWH/hh (per half hour)'] = df.groupby('LCLid')['KWH/hh (per half hour)'].transform(
-    lambda x: (x - x.min()) / (x.max() - x.min()) if x.max() != x.min() else 0
+    lambda x: (2 * (x - x.min()) / (x.max() - x.min()) - 1) if x.max() != x.min() else 0
 )
 
 # Handle cases where max = min (to avoid division by zero)
@@ -129,7 +127,7 @@ y = np.stack(dataset["load_curve"].values, axis=0)    # guaranteed equal shapes
 # 6.  TRAIN / VALIDATION SPLIT   (uses the one-hot matrix here)
 # ----------------------------------------------------------------------
 X_tr, X_val, y_tr, y_val = train_test_split(
-    X, y, test_size=0.2, random_state=42)
+    X, y, test_size=0.1, random_state=42)
 
 import torch
 # X_tr = torch.from_numpy(X_tr).float()

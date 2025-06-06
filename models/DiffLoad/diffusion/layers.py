@@ -207,18 +207,6 @@ class Attention(nn.Module):
             nn.Linear(args.hidden_dim, args.hidden_dim),
             nn.Tanh()
         )
-        # self.cond_embedder2 = nn.Sequential(
-        #     nn.Linear(args.cond_dim, args.hidden_dim),
-        #     nn.Tanh(),
-        #     nn.Linear(args.hidden_dim, args.hidden_dim),
-        #     nn.Tanh()
-        # )
-        # self.cond_embedder3 = nn.Sequential(
-        #     nn.Linear(args.cond_dim, args.hidden_dim),
-        #     nn.Tanh(),
-        #     nn.Linear(args.hidden_dim, 7),
-        #     nn.Softmax()
-        # )
         self.embedding = PositionalEncoding(args.hidden_dim)
         self.encoder_layer = nn.TransformerEncoderLayer(
             d_model=args.hidden_dim, nhead=4, dim_feedforward=args.hidden_dim
@@ -239,3 +227,6 @@ class Attention(nn.Module):
         out = F.leaky_relu(self.linear1(trans_enc))
         
         return self.linear2(out)
+    
+
+

@@ -16,9 +16,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else "cpu"
 def main(args):
     data_dir = f"./data/london/{args.num_users}"
     X_tr = torch.load(f"{data_dir}/X_tr.pt")
-    X_val = torch.load(f"{data_dir}/X_val.pt")
     y_tr = torch.load(f"{data_dir}/y_tr.pt")
-    y_val = torch.load(f"{data_dir}/y_val.pt")
     # Select betas
     n_steps = args.n_steps
     args.cond_dim = X_tr.shape[-1]
@@ -78,16 +76,18 @@ def main(args):
 
 if __name__ == "__main__":
     config = {
-    'n_steps': 500,
+    'n_steps': 1000,
     'input_dim': 48,
     'hidden_dim': 2000,
     'nhead': 4,
-    'cond_dim': 251,
-    'epoch': 10000,
+    'cond_dim': 100,
+    'n_layers': 10,
+    'dropout': 0.1,
+    'epoch': 2000,
     'batch_size': 5000,
     'learning_rate': 1e-4,
     'lr_decay': 0.9,
-    'lr_decay_step':1000,
+    'lr_decay_step':50,
     'ema_decay': 0.9,
     'beta_start': 1e-6,
     'beta_end': 2e-2,

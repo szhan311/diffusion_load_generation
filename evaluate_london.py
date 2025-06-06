@@ -30,12 +30,12 @@ def main(args):
         for i in range(len(y_val_k)):
             plt.plot(y_val_k[i])
         plt.title("real data")
-        plt.ylim(0, 1)
+        plt.ylim(-1, 1)
         plt.subplot(1,2,2)
         for i in range(len(y_val_k)):
             plt.plot(y_fake_k[i])
         plt.title("fake data")
-        plt.ylim(0, 1)
+        plt.ylim(-1, 1)
         
         save_dir = f'result/imgs/{args.num_users}'
         os.makedirs(save_dir, exist_ok=True)
@@ -45,7 +45,7 @@ def main(args):
 if __name__ == '__main__':
     config = {
         'num_users':500,
-        'epochs':1000
+        'epochs':2500
     }
     args = ObjectView(config)
     main(args)
