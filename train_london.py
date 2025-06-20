@@ -70,7 +70,7 @@ def main(args):
                 'ddpm': ddpm,
                 'Loss': Loss
             }
-            save_dir = f"./result/ckpts9/london_{args.num_users}"
+            save_dir = f"./result/ckpts10/london_{args.num_users}"
             os.makedirs(save_dir, exist_ok=True)
             torch.save(checkpoint, f"{save_dir}/{j+1}.pth")
         
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     config = {
     'n_steps': 500,
     'input_dim': 48,
-    'hidden_dim': 3000,
+    'hidden_dim': 2000,
     'nhead': 4,
     'cond_dim': 251,
     'epoch': 3000,

@@ -80,7 +80,7 @@ class DDPM1d(nn.Module):
         x_recon = self.sqrt_recip_alphas_cumprod[t] * x - self.sqrt_alphas_cumprod_m1[t] * eps_recon
 
         if self.clip_denoised and stable is False:
-            x_recon.clamp_(-1.0, 1.0)
+            # x_recon.clamp_(-1.0, 1.0)
             x_recon.clamp_(0.0, 1.0)
 
         model_mean = self.posterior_mean_coef_1[t] * x_recon + self.posterior_mean_coef_2[t] * x

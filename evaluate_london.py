@@ -14,13 +14,7 @@ def main(args):
     # Use safe_globals to load checkpoint securely
     from utils.helper import ObjectView
     checkpoint = torch.load(f'./result/ckpts/london_{args.num_users}/{args.epochs}.pth', weights_only=False)
-    print(checkpoint['config'].n_steps)
-    print(checkpoint['config'].epoch)
-    print(checkpoint['config'].hidden_dim)
-    print(checkpoint['config'].learning_rate)
-    print(checkpoint['config'].lr_decay)
-    print(checkpoint['config'].lr_decay_step)
-    print(checkpoint['config'].ema_decay)
+    print(checkpoint['config'].__dict__)
     ddpm = checkpoint['ddpm']
     
     # Sample for 10 users

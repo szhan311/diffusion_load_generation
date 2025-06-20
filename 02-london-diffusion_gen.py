@@ -24,7 +24,7 @@ def main(args):
     # checkpoint = torch.load(f'./result/ckpts/london_{args.num_users}/{args.epochs}.pth', weights_only=False)
     
     # y_test = y_test * 2 - 1
-    checkpoint = torch.load(f'./result/ckpts/london_{args.num_users}/{args.epochs}.pth', weights_only=False)
+    checkpoint = torch.load(f'./result/ckpts10/london_{args.num_users}/{args.epochs}.pth', weights_only=False)
     print(f"length of test samples: {len(X_test)}")
     device = torch.device("cuda")
     
