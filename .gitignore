@@ -178,6 +178,7 @@ cython_debug/
 
 .DS_Store
 /result
-
+/data
+*.pt
 *.jpg
 
